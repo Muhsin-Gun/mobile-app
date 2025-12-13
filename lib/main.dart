@@ -5,6 +5,12 @@ import 'package:e_shop/screens/home_screen.dart';
 import 'package:provider/provider.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Firebase initialization disabled on Windows due to linker compatibility issues.
+  // Firebase works on Android and iOS. To enable, use:
+  // import 'package:firebase_core/firebase_core.dart';
+  // import 'firebase_options.dart';
+  // Then: await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(
     MultiProvider(
       providers: [

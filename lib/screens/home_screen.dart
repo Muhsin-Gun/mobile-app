@@ -1,5 +1,6 @@
 import 'package:e_shop/constants/app_colors.dart';
 import 'package:e_shop/providers/theme_provider.dart';
+import 'package:e_shop/screens/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -42,6 +43,17 @@ class HomeScreen extends StatelessWidget {
             SizedBox(height: 50),
 
             ElevatedButton(onPressed: () {}, child: Text("Buy Now")),
+
+            SizedBox(height: 20),
+
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const SignupScreen()),
+                );
+              },
+              child: Text("Sign Up"),
+            ),
 
             SwitchListTile(
 
