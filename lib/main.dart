@@ -1,41 +1,36 @@
-import 'package:e_shop/providers/theme_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:e_shop/constants/app_colors.dart';
-import 'package:e_shop/screens/home_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:cryptex_trading/constants/app_colors.dart';
+import 'package:cryptex_trading/constants/theme_data.dart';
+import 'package:cryptex_trading/providers/theme_provider.dart';
+import 'package:cryptex_trading/screens/client/main_dashboard.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  // Firebase initialization disabled on Windows due to linker compatibility issues.
-  // Firebase works on Android and iOS. To enable, use:
-  // import 'package:firebase_core/firebase_core.dart';
-  // import 'firebase_options.dart';
-  // Then: await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(
-          create: (_) {
-            return ThemeProvider();
-          },
-        ),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
-      child: Builder(
-        builder: (context) {
-          final themeProvider = Provider.of<ThemeProvider>(context);
-          return MaterialApp(
-            theme: ThemeData.light().copyWith(
-              scaffoldBackgroundColor: AppColors.lightScaffoldColor,
-            ),
-            darkTheme: ThemeData.dark().copyWith(
-              scaffoldBackgroundColor: AppColors.darkScaffoldColor,
-            ),
-            themeMode:
-                themeProvider.getIsDarkTHeme ? ThemeMode.dark : ThemeMode.light,
-            home: Scaffold(body: HomeScreen()),
-          );
-        },
-      ),
+      child: const CryptexApp(),
     ),
   );
+}
+
+class CryptexApp extends StatelessWidget {
+  const CryptexApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    
+    return MaterialApp(
+      title: 'CrypTex Trading',
+      debugShowCheckedModeBanner: false,
+      theme: Styles.themeData(isDarkTheme: false, context: context),
+      darkTheme: Styles.themeData(isDarkTheme: true, context: context),
+      themeMode: themeProvider.getIsDarkTHeme ? ThemeMode.dark : ThemeMode.light,
+      home: const MainDashboard(),
+    );
+  }
 }

@@ -1,9 +1,10 @@
-modules = ["cpp-clang14", "swift-5.8", "c-clang14", "dart-3.8"]
+modules = ["cpp-clang14", "swift-5.8", "c-clang14", "dart-3.8", "nodejs-20"]
 [agent]
 expertMode = true
 
 [nix]
 channel = "stable-25_05"
+packages = ["flutter", "chromium", "dhall"]
 
 [userenv]
 
@@ -11,3 +12,31 @@ channel = "stable-25_05"
 MPESA_ENV = "sandbox"
 MPESA_SHORTCODE = "174379"
 MPESA_CALLBACK_URL = "https://your-callback-url.com/mpesa/callback"
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "CrypTex Trading"
+
+[[workflows.workflow]]
+name = "CrypTex Trading"
+author = "agent"
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node server.js"
+waitForPort = 5000
+
+[[ports]]
+localPort = 5000
+externalPort = 80
