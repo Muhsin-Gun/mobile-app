@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cryptex_trading/constants/app_colors.dart';
+import 'package:cryptex_trading/services/mpesa_service.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:html' as html;
 
 class PaymentScreen extends StatefulWidget {
   const PaymentScreen({super.key});
@@ -13,6 +16,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
   final _amountController = TextEditingController(text: '100');
   bool _isLoading = false;
   String? _statusMessage;
+  late final MpesaService _mpesaService;
+
+  @override
+  void initState() {
+    super.initState();
+    final baseUrl = kIsWeb ? html.window.location.origin : 'http://localhost:5000';
+    _mpesaService = MpesaService(baseUrl: baseUrl);
+  }
 
   Future<void> _initiatePayment() async {
     if (_phoneController.text.isEmpty || _amountController.text.isEmpty) {
@@ -25,20 +36,38 @@ class _PaymentScreenState extends State<PaymentScreen> {
       _statusMessage = null;
     });
 
-    await Future.delayed(const Duration(seconds: 2));
-
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-        _statusMessage = 'STK Push sent! Please check your phone and enter your M-Pesa PIN.';
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Check your phone for the M-Pesa prompt'),
-          backgroundColor: AppColors.primary,
-        ),
+    try {
+      final result = await _mpesaService.initiateSTKPush(
+        phoneNumber: _phoneController.text,
+        amount: int.tryParse(_amountController.text) ?? 100,
+        accountReference: 'CrypTex',
+        transactionDesc: 'Deposit',
       );
+
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _statusMessage = result['success'] == true
+              ? 'STK Push sent! Please check your phone and enter your M-Pesa PIN.'
+              : result['message'] ?? 'Payment initiation failed';
+        });
+
+        if (result['success'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Check your phone for the M-Pesa prompt'),
+              backgroundColor: AppColors.primary,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _statusMessage = 'Error: $e';
+        });
+      }
     }
   }
 
