@@ -1,4 +1,4 @@
-enum CourseCategory { ict, smc, smt, quant, fundamental, priceAction, orderFlow, psychology, riskManagement }
+enum CourseCategory { ict, smc, smt, quant, fundamental, priceAction, orderFlow, psychology, riskManagement, msnr, crt, domFootprint, sniperEntry, exitStrategies }
 enum ContentType { video, article, quiz, interactive }
 enum DifficultyLevel { beginner, intermediate, advanced, expert }
 
@@ -40,6 +40,11 @@ class Course {
       case CourseCategory.orderFlow: return 'Order Flow';
       case CourseCategory.psychology: return 'Trading Psychology';
       case CourseCategory.riskManagement: return 'Risk Management';
+      case CourseCategory.msnr: return 'MSNR - Market Structure Narrative';
+      case CourseCategory.crt: return 'CRT - Candle Range Theory';
+      case CourseCategory.domFootprint: return 'DOM & Footprint Charts';
+      case CourseCategory.sniperEntry: return 'Sniper Entry Strategies';
+      case CourseCategory.exitStrategies: return 'Exit Strategies';
     }
   }
 

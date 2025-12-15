@@ -266,6 +266,11 @@ class _CourseCard extends StatelessWidget {
       case CourseCategory.fundamental: return Colors.orange;
       case CourseCategory.psychology: return Colors.pink;
       case CourseCategory.riskManagement: return Colors.teal;
+      case CourseCategory.msnr: return Colors.cyan;
+      case CourseCategory.crt: return Colors.amber;
+      case CourseCategory.domFootprint: return Colors.indigo;
+      case CourseCategory.sniperEntry: return Colors.red;
+      case CourseCategory.exitStrategies: return Colors.lime;
     }
   }
 
@@ -280,6 +285,11 @@ class _CourseCard extends StatelessWidget {
       case CourseCategory.fundamental: return Icons.analytics;
       case CourseCategory.psychology: return Icons.psychology;
       case CourseCategory.riskManagement: return Icons.shield;
+      case CourseCategory.msnr: return Icons.account_tree;
+      case CourseCategory.crt: return Icons.layers;
+      case CourseCategory.domFootprint: return Icons.bar_chart;
+      case CourseCategory.sniperEntry: return Icons.my_location;
+      case CourseCategory.exitStrategies: return Icons.exit_to_app;
     }
   }
 
