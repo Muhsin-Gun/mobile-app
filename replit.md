@@ -8,6 +8,29 @@ CrypTex is a cross-platform cryptocurrency and forex trading dashboard built wit
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes (December 15, 2025)
+
+### Authentication System
+- Email/password registration and login
+- Google OAuth integration ready (requires GOOGLE_CLIENT_ID/SECRET)
+- JWT token-based authentication
+- PostgreSQL database for user storage
+
+### AI Trading Assistant
+- Powered by Groq API (llama-3.1-70b-versatile model)
+- ICT/SMC-focused analysis capabilities
+- Real-time market structure analysis
+- Signal generation with entry/SL/TP levels
+- Interactive chat for trading questions
+
+### Expanded Education Courses
+New course categories added:
+- MSNR (Market Structure Narrative)
+- CRT (Candle Range Theory)
+- DOM & Footprint Charts
+- Sniper Entry Strategies
+- Exit Strategies
+
 ## System Architecture
 
 ### Frontend Architecture
@@ -32,18 +55,26 @@ Preferred communication style: Simple, everyday language.
 **Web Server**: Node.js (server.js)
 - Serves the Flutter web build from `./build/web` directory
 - Runs on port 5000
-- Handles M-Pesa payment integration endpoints
+- Authentication endpoints: /api/auth/*
+- AI endpoints: /api/ai/*
+- M-Pesa payment endpoints: /api/mpesa/*
+
+**Database**: PostgreSQL
+- Users table with auth info
+- Sessions, trading history, AI conversations
+
+**AI Integration**: Groq API
+- Environment variable: GROQ_API_KEY
+- Model: llama-3.1-70b-versatile
+- Endpoints:
+  - POST /api/ai/chat - Chat with AI assistant
+  - POST /api/ai/analyze - Get market analysis
+  - POST /api/ai/signal - Generate trading signals
 
 **Payment Integration**: Safaricom M-Pesa
 - Supports sandbox and production environments
 - OAuth token generation for API authentication
 - STK Push for mobile payment initiation
-- Configurable via environment variables:
-  - `MPESA_CONSUMER_KEY`
-  - `MPESA_CONSUMER_SECRET`
-  - `MPESA_PASSKEY`
-  - `MPESA_SHORTCODE`
-  - `MPESA_ENV` (sandbox/production)
 
 ### Data & Real-time Features
 
@@ -58,42 +89,39 @@ Preferred communication style: Simple, everyday language.
 **Local Storage**:
 - `shared_preferences` - Persisting user settings and demo wallet state
 
-## External Dependencies
+## Key Files
 
-### Third-Party Services
+### Backend
+- `server.js` - Node.js server with auth, AI, and payment endpoints
 
-**Firebase**
-- Project ID: `eshop-be005`
-- Android app configured with google-services.json
-- Used for backend services (specific features TBD based on Firebase console setup)
+### Flutter Services
+- `lib/services/ai_trading_service.dart` - AI API client
+- `lib/services/education_service.dart` - Trading courses (14 courses)
+- `lib/services/trading_analysis_service.dart` - Local market analysis
 
-**TradingView**
-- Embedded charting widgets via `https://s3.tradingview.com/tv.js`
-- Professional-grade financial charts for crypto/forex visualization
+### Flutter Screens
+- `lib/screens/client/trading_tab.dart` - AI trading analysis with chat
+- `lib/screens/client/education_tab.dart` - Course listings
 
-**M-Pesa API (Safaricom)**
-- Mobile money payment processing for Kenyan market
-- Sandbox: `sandbox.safaricom.co.ke`
-- Production: `api.safaricom.co.ke`
+### Flutter Models
+- `lib/models/education.dart` - Course/Lesson models with 14 categories
 
-### Key Flutter Packages
+## Build & Deploy
 
-| Package | Purpose |
-|---------|---------|
-| provider | State management |
-| http | HTTP client for APIs |
-| web_socket_channel | Real-time data streams |
-| shared_preferences | Local persistence |
-| cached_network_image | Image caching |
-| fl_chart | Native charts |
-| crypto | Cryptographic utilities |
-| uuid | Unique identifier generation |
-| url_launcher | External link handling |
-| intl | Internationalization/formatting |
+The web build is pre-compiled to `build/web/` and served by the Node.js server.
 
-### Build Outputs
+To rebuild Flutter web:
+```bash
+flutter build web --release
+```
 
-The web build is pre-compiled to `build/web/` and served by the Node.js server. The Flutter web build uses:
-- CanvasKit renderer (WebAssembly-based)
-- Service worker for offline caching
-- PWA manifest for installability
+## Environment Variables
+
+Required:
+- `DATABASE_URL` - PostgreSQL connection string
+- `GROQ_API_KEY` - For AI features
+
+Optional:
+- `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` - For Google OAuth
+- `MPESA_CONSUMER_KEY`, `MPESA_CONSUMER_SECRET` - For M-Pesa
+- `JWT_SECRET` - Custom JWT signing key
