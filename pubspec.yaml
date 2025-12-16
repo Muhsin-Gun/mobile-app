@@ -1,7 +1,7 @@
 name: cryptex_trading
 description: "Advanced Crypto & Forex Trading Platform with ICT/SMC Analysis"
 publish_to: 'none'
-version: 1.0.0+1
+version: 2.0.0+1
 
 environment:
   sdk: ^3.8.0
@@ -23,6 +23,12 @@ dependencies:
   uuid: ^4.5.1
   crypto: ^3.0.6
   web_socket_channel: ^3.0.1
+  firebase_core: ^3.12.1
+  firebase_auth: ^5.5.4
+  cloud_firestore: ^5.6.6
+  firebase_storage: ^12.4.4
+  google_sign_in: ^6.2.2
+  firebase_messaging: ^15.2.4
 
 dev_dependencies:
   flutter_test:
