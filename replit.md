@@ -1,127 +1,57 @@
-# CrypTex Trading Platform
+# CrypTex Trading - Professional Crypto/Forex Trading Platform
 
 ## Overview
+A professional cryptocurrency and forex trading platform built with Flutter Web and Firebase backend. The app provides real-time market data, AI-powered trading analysis, comprehensive trading education, and M-Pesa payment integration.
 
-CrypTex is a cross-platform cryptocurrency and forex trading dashboard built with Flutter. The application provides users with real-time crypto price tracking, interactive charts via TradingView integration, demo wallet management, and educational crypto content. The project targets web deployment primarily, with support for Android, iOS, Linux, Windows, and macOS platforms.
+## Current State
+- **Login/Signup Flow**: Shows FIRST before accessing any features (AuthGate pattern)
+- **Firebase Backend**: Auth, Firestore, Storage, Messaging integrated
+- **Real Market Data**: CoinGecko API + TradingView widgets
+- **AI Trading Assistant**: Groq API integration for analysis and signals
+- **Professional UI**: Dark theme inspired by JustMarkets, Exness, Quamatix
 
-## User Preferences
-
-Preferred communication style: Simple, everyday language.
-
-## Recent Changes (December 15, 2025)
-
-### Authentication System
-- Email/password registration and login
-- Google OAuth integration ready (requires GOOGLE_CLIENT_ID/SECRET)
-- JWT token-based authentication
-- PostgreSQL database for user storage
-
-### AI Trading Assistant
-- Powered by Groq API (llama-3.1-70b-versatile model)
-- ICT/SMC-focused analysis capabilities
-- Real-time market structure analysis
-- Signal generation with entry/SL/TP levels
-- Interactive chat for trading questions
-
-### Expanded Education Courses
-New course categories added:
-- MSNR (Market Structure Narrative)
-- CRT (Candle Range Theory)
-- DOM & Footprint Charts
-- Sniper Entry Strategies
-- Exit Strategies
-
-## System Architecture
-
-### Frontend Architecture
-
-**Framework**: Flutter (Dart)
-- Cross-platform UI framework targeting web, mobile (Android/iOS), and desktop (Linux/Windows/macOS)
-- Web build uses CanvasKit renderer for high-fidelity graphics
-- Dark mode first design with neon accent colors (#4ADE80 green, #6366F1 indigo)
-
-**State Management**: Provider pattern
-- Uses the `provider` package for reactive state management across the app
-
-**Key UI Dependencies**:
-- `cached_network_image` - Efficient image loading and caching
-- `fl_chart` - Native Flutter charting for price visualization
-- `flutter_svg` - SVG asset rendering
-- `google_fonts` - Custom typography
-- `shimmer` - Loading state animations
-
-### Backend Architecture
-
-**Web Server**: Node.js (server.js)
-- Serves the Flutter web build from `./build/web` directory
-- Runs on port 5000
-- Authentication endpoints: /api/auth/*
-- AI endpoints: /api/ai/*
-- M-Pesa payment endpoints: /api/mpesa/*
-
-**Database**: PostgreSQL
-- Users table with auth info
-- Sessions, trading history, AI conversations
-
-**AI Integration**: Groq API
-- Environment variable: GROQ_API_KEY
-- Model: llama-3.1-70b-versatile
-- Endpoints:
-  - POST /api/ai/chat - Chat with AI assistant
-  - POST /api/ai/analyze - Get market analysis
-  - POST /api/ai/signal - Generate trading signals
-
-**Payment Integration**: Safaricom M-Pesa
-- Supports sandbox and production environments
-- OAuth token generation for API authentication
-- STK Push for mobile payment initiation
-
-### Data & Real-time Features
-
-**Market Data**:
-- `web_socket_channel` - WebSocket connections for real-time price feeds
-- `http` package for REST API calls to crypto exchanges
-
-**Charts**:
-- TradingView widget integration via JavaScript library loaded in web/index.html
-- Native `fl_chart` for in-app chart components
-
-**Local Storage**:
-- `shared_preferences` - Persisting user settings and demo wallet state
-
-## Key Files
-
-### Backend
-- `server.js` - Node.js server with auth, AI, and payment endpoints
-
-### Flutter Services
-- `lib/services/ai_trading_service.dart` - AI API client
-- `lib/services/education_service.dart` - Trading courses (14 courses)
-- `lib/services/trading_analysis_service.dart` - Local market analysis
-
-### Flutter Screens
-- `lib/screens/client/trading_tab.dart` - AI trading analysis with chat
-- `lib/screens/client/education_tab.dart` - Course listings
-
-### Flutter Models
-- `lib/models/education.dart` - Course/Lesson models with 14 categories
-
-## Build & Deploy
-
-The web build is pre-compiled to `build/web/` and served by the Node.js server.
-
-To rebuild Flutter web:
-```bash
-flutter build web --release
+## Architecture
+```
+lib/
+├── main.dart                    # App entry point, Firebase init
+├── constants/                   # Colors, themes
+├── models/                      # Data models (CryptoAsset, TradingSignal, etc)
+├── providers/                   # State management (Auth, Theme)
+├── screens/
+│   ├── auth/                    # Login, Signup, AuthGate, Splash
+│   └── client/                  # Main dashboard tabs
+├── services/                    # Business logic (Auth, Market, AI, Education)
+└── widgets/                     # Reusable components
 ```
 
-## Environment Variables
+## Key Features
+1. **Authentication**: Email/password + Google Sign-In via Firebase
+2. **Markets**: Real-time crypto prices from CoinGecko, forex pairs
+3. **Trading**: TradingView charts, AI analysis, signal generation
+4. **Education**: Trading courses (ICT, SMC, SMT, Order Flow, Price Action)
+5. **Payments**: M-Pesa integration (Daraja API)
+6. **Profile**: User settings, wallet, transaction history
 
-Required:
-- `DATABASE_URL` - PostgreSQL connection string
-- `GROQ_API_KEY` - For AI features
+## Technology Stack
+- **Frontend**: Flutter 3.32.0 (Web)
+- **Backend**: Firebase (Auth, Firestore, Storage)
+- **APIs**: CoinGecko, Groq AI, Daraja (M-Pesa)
+- **Server**: Dart HTTP server on port 5000
 
-Optional:
-- `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` - For Google OAuth
-- `MPESA_CONSUMER_KEY`, `MPESA_CONSUMER_SECRET` - For M-Pesa
-- `JWT_SECRET` - Custom JWT signing key
+## Running the App
+```bash
+flutter build web --release
+dart run web_server.dart
+```
+
+## Environment Variables Needed
+- `GROQ_API_KEY` - For AI trading analysis
+- `MPESA_CONSUMER_KEY` - M-Pesa API
+- `MPESA_CONSUMER_SECRET` - M-Pesa API
+
+## Recent Changes (December 2024)
+- Migrated from Node.js to Firebase backend
+- Added AuthGate for login-first flow
+- Integrated Groq AI for trading analysis
+- Enhanced UI with professional trading app design
+- Added comprehensive trading education courses
