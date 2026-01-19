@@ -8,23 +8,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:e_shop/screens/home_screen.dart';
-import 'package:e_shop/providers/theme_provider.dart';
-import 'package:provider/provider.dart';
+import 'package:services_marketplace/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build HomeScreen inside a Provider so it has the ThemeProvider available.
-    await tester.pumpWidget(
-      ChangeNotifierProvider<ThemeProvider>(
-        create: (_) => ThemeProvider(),
-        child: const MaterialApp(
-          home: Scaffold(body: HomeScreen()),
-        ),
-      ),
-    );
+  testWidgets('Services Marketplace App loads', (WidgetTester tester) async {
+    // Build our app and trigger a frame.
+    await tester.pumpWidget(const ServicesMarketplaceApp());
 
-    // Verify HomeScreen shows the main title.
-    expect(find.text('Duka Letu'), findsOneWidget);
+    // Verify app loads
+    expect(find.byType(MaterialApp), findsOneWidget);
   });
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cryptex_trading/screens/auth/splash_screen.dart';
-import 'package:cryptex_trading/screens/auth/login_screen.dart';
-import 'package:cryptex_trading/screens/client/main_dashboard.dart';
+import 'package:services_marketplace/screens/auth/splash_screen.dart';
+import 'package:services_marketplace/screens/auth/login_screen.dart';
+import 'package:services_marketplace/screens/marketplace/marketplace_home_screen.dart';
 
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
@@ -15,11 +15,11 @@ class AuthGate extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const SplashScreen();
         }
-        
+
         if (snapshot.hasData && snapshot.data != null) {
-          return const MainDashboard();
+          return const MarketplaceHomeScreen();
         }
-        
+
         return const LoginScreen();
       },
     );

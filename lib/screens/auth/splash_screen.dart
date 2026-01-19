@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cryptex_trading/constants/app_colors.dart';
+import 'package:services_marketplace/constants/app_colors.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});

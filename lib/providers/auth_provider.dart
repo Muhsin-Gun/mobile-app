@@ -1,35 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cryptex_trading/services/auth_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AuthProvider extends ChangeNotifier {
-  final AuthService _authService = AuthService();
-  
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   User? _user;
   Map<String, dynamic>? _userProfile;
   bool _isLoading = false;
-  String? _error;
+  String? _errorMessage;
 
+  // Getters
   User? get user => _user;
   Map<String, dynamic>? get userProfile => _userProfile;
   bool get isLoading => _isLoading;
-  String? get error => _error;
+  String? get errorMessage => _errorMessage;
   bool get isAuthenticated => _user != null;
-  
-  String get userName => _userProfile?['name'] ?? _user?.displayName ?? 'Trader';
-  String get userEmail => _user?.email ?? '';
-  String? get userAvatar => _userProfile?['avatarUrl'] ?? _user?.photoURL;
-  bool get isPremium => _userProfile?['isPremium'] ?? false;
 
   AuthProvider() {
-    _init();
-  }
-
-  void _init() {
-    _authService.authStateChanges.listen((User? user) {
+    _firebaseAuth.authStateChanges().listen((User? user) {
       _user = user;
       if (user != null) {
-        _loadUserProfile();
+        _fetchUserProfile(user.uid);
       } else {
         _userProfile = null;
       }
@@ -37,96 +30,164 @@ class AuthProvider extends ChangeNotifier {
     });
   }
 
-  Future<void> _loadUserProfile() async {
-    _userProfile = await _authService.getUserProfile();
+  // Sign up with email and password
+  Future<bool> signUp({
+    required String email,
+    required String password,
+    required String name,
+    required String phone,
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
     notifyListeners();
-  }
 
-  Future<bool> signInWithEmail(String email, String password) async {
-    _setLoading(true);
-    _error = null;
-    
     try {
-      await _authService.signInWithEmail(email, password);
-      await _loadUserProfile();
-      _setLoading(false);
-      return true;
-    } catch (e) {
-      _error = e.toString();
-      _setLoading(false);
-      return false;
-    }
-  }
+      final UserCredential userCredential = await _firebaseAuth
+          .createUserWithEmailAndPassword(email: email, password: password);
 
-  Future<bool> signUpWithEmail(String email, String password, String name) async {
-    _setLoading(true);
-    _error = null;
-    
-    try {
-      await _authService.signUpWithEmail(email, password, name);
-      await _loadUserProfile();
-      _setLoading(false);
-      return true;
-    } catch (e) {
-      _error = e.toString();
-      _setLoading(false);
-      return false;
-    }
-  }
+      final User? user = userCredential.user;
+      if (user != null) {
+        await user.updateDisplayName(name);
 
-  Future<bool> signInWithGoogle() async {
-    _setLoading(true);
-    _error = null;
-    
-    try {
-      final result = await _authService.signInWithGoogle();
-      if (result != null) {
-        await _loadUserProfile();
-        _setLoading(false);
+        // Create user profile in Firestore
+        await _firestore.collection('users').doc(user.uid).set({
+          'uid': user.uid,
+          'email': email,
+          'name': name,
+          'phone': phone,
+          'profileImage': '',
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+
+        _user = user;
+        await _fetchUserProfile(user.uid);
+        _isLoading = false;
+        notifyListeners();
         return true;
       }
-      _setLoading(false);
+    } on FirebaseAuthException catch (e) {
+      _errorMessage = e.message ?? 'Sign up failed';
+      _isLoading = false;
+      notifyListeners();
       return false;
-    } catch (e) {
-      _error = e.toString();
-      _setLoading(false);
+    }
+    _isLoading = false;
+    notifyListeners();
+    return false;
+  }
+
+  // Sign in with email and password
+  Future<bool> signIn({required String email, required String password}) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      await _firebaseAuth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } on FirebaseAuthException catch (e) {
+      _errorMessage = e.message ?? 'Sign in failed';
+      _isLoading = false;
+      notifyListeners();
       return false;
     }
   }
 
-  Future<void> signOut() async {
-    await _authService.signOut();
-    _userProfile = null;
-    notifyListeners();
+  // Fetch user profile from Firestore
+  Future<void> _fetchUserProfile(String uid) async {
+    try {
+      final DocumentSnapshot<Map<String, dynamic>> doc = await _firestore
+          .collection('users')
+          .doc(uid)
+          .get();
+      _userProfile = doc.data();
+      notifyListeners();
+    } catch (e) {
+      _errorMessage = 'Failed to fetch user profile';
+    }
   }
 
-  Future<bool> resetPassword(String email) async {
-    _setLoading(true);
-    _error = null;
-    
+  // Update user profile
+  Future<bool> updateUserProfile({
+    required String userId,
+    String? name,
+    String? phone,
+    String? profileImage,
+  }) async {
     try {
-      await _authService.resetPassword(email);
-      _setLoading(false);
+      final Map<String, dynamic> updateData = {};
+      if (name != null) updateData['name'] = name;
+      if (phone != null) updateData['phone'] = phone;
+      if (profileImage != null) updateData['profileImage'] = profileImage;
+
+      await _firestore.collection('users').doc(userId).update(updateData);
+      await _fetchUserProfile(userId);
       return true;
     } catch (e) {
-      _error = e.toString();
-      _setLoading(false);
+      _errorMessage = 'Failed to update profile';
       return false;
     }
   }
 
-  Future<void> updateProfile(Map<String, dynamic> data) async {
-    await _authService.updateUserProfile(data);
-    await _loadUserProfile();
+  // Reset password
+  Future<bool> resetPassword({required String email}) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } on FirebaseAuthException catch (e) {
+      _errorMessage = e.message ?? 'Failed to send reset email';
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
   }
 
-  void _setLoading(bool value) {
-    _isLoading = value;
-    notifyListeners();
+  // Sign out
+  Future<void> signOut() async {
+    try {
+      await _firebaseAuth.signOut();
+      _user = null;
+      _userProfile = null;
+      notifyListeners();
+    } catch (e) {
+      _errorMessage = 'Failed to sign out';
+      notifyListeners();
+    }
   }
 
   void clearError() {
-    _error = null;
+    _errorMessage = null;
     notifyListeners();
+  }
+
+  // Sign in with Google
+  Future<bool> signInWithGoogle() async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      // TODO: Implement Google Sign-In with google_sign_in package
+      // For now, this is a placeholder
+      _isLoading = false;
+      notifyListeners();
+      return false; // Google Sign-In not implemented yet
+    } catch (e) {
+      _errorMessage = 'Google sign-in failed: $e';
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
   }
 }

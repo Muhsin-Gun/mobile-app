@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:cryptex_trading/constants/app_colors.dart';
-import 'package:cryptex_trading/providers/auth_provider.dart';
+import 'package:services_marketplace/constants/app_colors.dart';
+import 'package:services_marketplace/providers/auth_provider.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -25,14 +25,16 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final success = await authProvider.resetPassword(_emailController.text.trim());
+    final success = await authProvider.resetPassword(
+      email: _emailController.text.trim(),
+    );
 
     if (success && mounted) {
       setState(() => _emailSent = true);
-    } else if (mounted && authProvider.error != null) {
+    } else if (mounted && authProvider.errorMessage != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(authProvider.error!),
+          content: Text(authProvider.errorMessage!),
           backgroundColor: AppColors.bearish,
         ),
       );
@@ -42,7 +44,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
-    
+
     return Scaffold(
       backgroundColor: AppColors.darkBackground,
       appBar: AppBar(
@@ -56,7 +58,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: _emailSent ? _buildSuccessView() : _buildFormView(authProvider),
+          child: _emailSent
+              ? _buildSuccessView()
+              : _buildFormView(authProvider),
         ),
       ),
     );
@@ -77,11 +81,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: AppColors.darkBorder),
             ),
-            child: Icon(
-              Icons.lock_reset,
-              size: 40,
-              color: AppColors.primary,
-            ),
+            child: Icon(Icons.lock_reset, size: 40, color: AppColors.primary),
           ),
           const SizedBox(height: 32),
           const Text(
@@ -114,10 +114,18 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 hintText: 'Email',
-                hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.4)),
-                prefixIcon: Icon(Icons.email_outlined, color: Colors.white.withValues(alpha: 0.5)),
+                hintStyle: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.4),
+                ),
+                prefixIcon: Icon(
+                  Icons.email_outlined,
+                  color: Colors.white.withValues(alpha: 0.5),
+                ),
                 border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 18,
+                ),
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -149,7 +157,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.transparent,
                 shadowColor: Colors.transparent,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
               ),
               child: authProvider.isLoading
                   ? const SizedBox(
@@ -225,7 +235,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.transparent,
               shadowColor: Colors.transparent,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
             ),
             child: const Text(
               'Back to Login',
