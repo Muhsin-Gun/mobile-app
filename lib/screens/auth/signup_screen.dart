@@ -196,7 +196,7 @@ class _SignupScreenState extends State<SignupScreen> {
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
-      // Register with email
+      // 1) Create user with Firebase Auth (via provider)
       final success = await authProvider.signUp(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
@@ -215,13 +215,29 @@ class _SignupScreenState extends State<SignupScreen> {
         return;
       }
 
-      // Upload image to Cloudinary
-      userImageUrl =
-          await _uploadImageToCloudinary(
+      // 2) Upload image to Cloudinary
+      userImageUrl = await _uploadImageToCloudinary(
             _pickedImageBytes!,
             _pickedImageName ?? 'profile.jpg',
           ) ??
           '';
+
+      if (userImageUrl.isEmpty) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Image upload failed')),
+          );
+        }
+        return;
+      }
+
+      // 3) Save image URL into Firestore profile via AuthProvider
+      if (authProvider.user != null) {
+        await authProvider.updateUserProfile(
+          userId: authProvider.user!.uid,
+          profileImage: userImageUrl,
+        );
+      }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -231,7 +247,10 @@ class _SignupScreenState extends State<SignupScreen> {
         );
 
         // Navigate to login screen
-        Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+        );
       }
     } catch (e) {
       if (mounted) {
@@ -524,9 +543,11 @@ class _SignupScreenState extends State<SignupScreen> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                Navigator.pushReplacementNamed(
+                                Navigator.pushReplacement(
                                   context,
-                                  LoginScreen.routeName,
+                                  MaterialPageRoute(
+                                    builder: (_) => const LoginScreen(),
+                                  ),
                                 );
                               },
                               child: Text(

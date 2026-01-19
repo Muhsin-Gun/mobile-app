@@ -87,11 +87,21 @@ class AuthProvider extends ChangeNotifier {
         email: email,
         password: password,
       );
+      // Helpful debug output (especially for web)
+      debugPrint('AuthProvider.signIn: success user=${_firebaseAuth.currentUser?.uid}');
       _isLoading = false;
       notifyListeners();
       return true;
     } on FirebaseAuthException catch (e) {
-      _errorMessage = e.message ?? 'Sign in failed';
+      // Include code so the UI can show a useful message even when `message` is null.
+      _errorMessage = e.message ?? 'Sign in failed (${e.code})';
+      debugPrint('AuthProvider.signIn: FirebaseAuthException code=${e.code} message=${e.message}');
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    } catch (e) {
+      _errorMessage = 'Sign in failed: $e';
+      debugPrint('AuthProvider.signIn: unexpected error $e');
       _isLoading = false;
       notifyListeners();
       return false;
