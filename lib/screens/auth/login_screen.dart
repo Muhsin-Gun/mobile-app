@@ -72,10 +72,10 @@ class _LoginScreenState extends State<LoginScreen> {
         return;
       }
 
-      // Navigate to home
-      if (mounted) {
-        Navigator.pop(context);
-      }
+      // Do not Navigator.pop() here.
+      // This screen is rendered as the app's "home" via AuthGate, so popping can
+      // remove the only route. AuthGate will automatically switch to the home
+      // screen when FirebaseAuth.authStateChanges() emits an authenticated user.
     } finally {
       if (mounted) {
         setState(() {
@@ -103,9 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    if (mounted) {
-      Navigator.pop(context);
-    }
+    // Same rationale as email/password login: AuthGate will handle navigation.
   }
 
   @override
