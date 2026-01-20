@@ -10,6 +10,9 @@ import 'package:services_marketplace/providers/admin_provider.dart';
 import 'package:services_marketplace/providers/products_provider.dart';
 import 'package:services_marketplace/providers/user_provider.dart';
 import 'package:services_marketplace/screens/auth/auth_gate.dart';
+import 'package:services_marketplace/screens/auth/forgot_password_screen.dart';
+import 'package:services_marketplace/screens/auth/login_screen.dart';
+import 'package:services_marketplace/screens/auth/signup_screen.dart';
 import 'package:services_marketplace/screens/admin/admin_login_screen.dart';
 import 'package:services_marketplace/screens/admin/admin_dashboard_screen.dart';
 import 'package:services_marketplace/screens/admin/add_product_screen.dart';
@@ -54,6 +57,12 @@ class ServicesMarketplaceApp extends StatelessWidget {
               ? ThemeMode.dark
               : ThemeMode.light,
           routes: {
+            // Auth
+            LoginScreen.routeName: (_) => const LoginScreen(),
+            SignupScreen.routeName: (_) => const SignupScreen(),
+            ForgotPasswordScreen.routeName: (_) => const ForgotPasswordScreen(),
+
+            // Admin / Employee
             AdminLoginScreen.routName: (_) => const AdminLoginScreen(),
             AdminDashboardScreen.routName: (_) => const AdminDashboardScreen(),
             AddProductScreen.routName: (_) => const AddProductScreen(),

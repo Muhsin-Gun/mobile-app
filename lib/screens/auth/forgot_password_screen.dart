@@ -4,6 +4,7 @@ import 'package:services_marketplace/constants/app_colors.dart';
 import 'package:services_marketplace/providers/auth_provider.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
+  static const routeName = '/ForgotPasswordScreen';
   const ForgotPasswordScreen({super.key});
 
   @override
